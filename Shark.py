@@ -6,6 +6,8 @@ import datetime
 import time
 import re
 import sys
+import threading
+from time import sleep
 
 SERVER = 'SHARK/1.0'
 
@@ -13,19 +15,21 @@ NOT_FOUND = 'error/404.html'
 
 EXT_PADRAO = 'text/html'
 
+STATUS = {200: "200 OK",
+		 404: "404 NOT FOUND"}
+
 ext = {'html': 'text/html',
 	   'htm': 'text/html',
 	   'txt': 'plane/txt',
 	   'png': 'image/png'}
 
 class Shark(object):
-	def __init__(self, ip, porta, tipo):
+	def __init__(self, ip, porta):
 		self.nome = SERVER
 		self.error = NOT_FOUND
 
 		self.ip = ip
 		self.porta = porta
-		self.tipo = tipo
 
 	def nome_servidor(self, nome):
 		self.nome = nome
@@ -33,13 +37,8 @@ class Shark(object):
 	def pagina_erro(self, local):
 		self.error = local
 
-	def nome_camada_transporte(self, cod):
-		if cod == socket.SOCK_STREAM:
-			return 'TCP'
-		elif cod == SOCK_DGRAM:
-			return 'UDP'
-		else:
-			return 'UNKNOWN'
+	def get_status(self, code):
+		return "HTTP/1.1 " + STATUS[code]
 
 	def obter_tipo(self, tipo):
 		if tipo not in ext:
@@ -71,14 +70,14 @@ class Shark(object):
 			content = self.obter_tipo(arq.split('.')[-1].lower())
 			
 
-			head = '''HTTP/1.1 200 OK
+			head = '''{5}
 Server: {3}
 Date: {1}
 Content-Type: {2}
 Last-Modified: {4}
 Content-Length: {0}
 
-'''.format(len(dados), datenow, content, self.nome, lastmodify)
+'''.format(len(dados), datenow, content, self.nome, lastmodify, self.get_status(200))
 		
 		except IOError as e:
 
@@ -88,16 +87,16 @@ Content-Length: {0}
 				dados = info[1]
 			
 			else:
-				head = '''HTTP/1.1 404 NOT FOUND
+				head = '''{0}
 
-				'''
+'''.format(self.get_status(404))
 
 				dados = open(self.error, 'r').read()
 
 		except IndexError:
-			head = '''HTTP/1.1 404 NOT FOUND
+			head = '''{0}
 
-				'''
+'''.format(self.get_status(404))
 
 			dados = open(self.error, 'r').read()
 
@@ -138,29 +137,34 @@ Content-Length: {0}
 		else:
 			return ()
 
+	def requisicao_cliente(self, con, info_cli):
+		req = con.recv(1024)
+
+		page = self.obter_pagina(req)
+
+		#print page
+		con.send(page)
+
+		con.close()
+
 	def start(self):
 		#try:
-		s = socket.socket(socket.AF_INET, self.tipo)
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 		s.bind((self.ip, self.porta))
 
-		s.listen(1)
+		s.listen(5)
 
-		print 'Servidor {2} Escutando. IP: {0}, Porta: {1}'.format(self.ip, self.porta, self.nome_camada_transporte(self.tipo))
+		print 'Servidor Shark Escutando. IP: {0}, Porta: {1}'.format(self.ip, self.porta)
 
 		while True:
 			try:
 				con, info_cli = s.accept()
-
-				req = con.recv(1024)
-
-				page = self.obter_pagina(req)
-
-				#print page
-				con.send(page)
-				con.close()
+				t1 = threading.Thread(target=self.requisicao_cliente, args=[con, info_cli])
+				t1.start()
+				t1.join()
 			except KeyboardInterrupt:
 				print 'Finalizando host...'
 				sys.exit(0)
