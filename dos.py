@@ -13,7 +13,7 @@ def requisicao(ip, id_th):
 threads = []  
   
 for i in range(0, 5000):
-    i = threading.Thread(target=requisicao, args=['http://127.0.0.1:8082', i])
+    i = threading.Thread(target=requisicao, args=['http://10.3.1.35:8080', i])
     threads.append(i)
 
 for i in threads:    

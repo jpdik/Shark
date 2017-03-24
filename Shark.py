@@ -18,24 +18,39 @@ EXT_PADRAO = 'text/html'
 STATUS = {200: "200 OK",
 		 404: "404 NOT FOUND"}
 
+RAIZ = '/'
+
 ext = {'html': 'text/html',
 	   'htm': 'text/html',
 	   'txt': 'plane/txt',
-	   'png': 'image/png'}
+	   'png': 'image/png',
+	   'iso': 'application/octetstream'}
 
 class Shark(object):
-	def __init__(self, ip, porta):
+	def __init__(self, ip, porta, raiz=RAIZ):
 		self.nome = SERVER
 		self.error = NOT_FOUND
+		self.raiz = RAIZ
+		self.set_raiz(raiz)
 
 		self.ip = ip
 		self.porta = porta
+		
 
 	def nome_servidor(self, nome):
 		self.nome = nome
 
 	def pagina_erro(self, local):
 		self.error = local
+
+	def set_raiz(self, raiz):
+		if os.path.exists('./' + raiz):
+			if raiz[-1] != '/':
+				self.raiz = raiz + '/'
+			else:
+				self.raiz = raiz
+		else:
+			print 'diretorio raiz não existente. utilizando raiz (\''+self.raiz+'\')'
 
 	def get_status(self, code):
 		return "HTTP/1.1 " + STATUS[code]
@@ -55,12 +70,16 @@ class Shark(object):
 			diretorio = re.findall('{0} (.*?) '.format(tipo), req)[0]
 
 			if diretorio == '':
-				diretorio = '/'
+				diretorio = self.raiz
+			else:
+				if arq != self.raiz:
+					diretorio = self.raiz + arq
 
 			if arq == '':
 				arq = 'index.html'
 
-			f = open(arq, 'r')
+			print diretorio
+			f = open('.' + diretorio, 'r')
 			dados = f.read()
 
 			utc_datetime = datetime.datetime.utcnow()
@@ -107,6 +126,7 @@ Content-Length: {0}
 	def gerar_lista_index(self, dir):
 		if os.path.exists('.' + dir):
 			files = os.listdir('.' + dir)
+			dir = dir[dir.find('/'):]
 			dados = '''<html>
 <head>
 <head>
@@ -117,8 +137,8 @@ Content-Length: {0}
 				raiz = dir[:dir.rfind('/')]
 				if len(raiz) < 1:
 					raiz = '/'
-				dados += '<dt><a href="/">..</dt>'
-				dados += '<dt><a href="'+raiz+'">.</dt>'
+				dados += '<dt><a href="..">..</dt>'
+				dados += '<dt><a href=".">.</dt>'
 				for i in files:
 					dados += '<dt><a href="'+dir+'/'+i+'">'+i+'</dt>'					
 			else:
@@ -155,6 +175,8 @@ Content-Length: {0}
 
 		s.bind((self.ip, self.porta))
 
+		print self.ip
+
 		s.listen(5)
 
 		print 'Servidor Shark Escutando. IP: {0}, Porta: {1}'.format(self.ip, self.porta)
@@ -164,7 +186,6 @@ Content-Length: {0}
 				con, info_cli = s.accept()
 				t1 = threading.Thread(target=self.requisicao_cliente, args=[con, info_cli])
 				t1.start()
-				t1.join()
 			except KeyboardInterrupt:
 				print 'Finalizando host...'
 				sys.exit(0)
