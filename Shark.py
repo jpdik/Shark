@@ -20,13 +20,14 @@ STATUS = {200: "200 OK",
 
 RAIZ = '/'
 
-ext = {'html': 'text/html',
+class Shark(object):
+	ext = {'html': 'text/html',
 	   'htm': 'text/html',
 	   'txt': 'plane/txt',
 	   'png': 'image/png',
+	   'jpg': 'image/jpg',
 	   'iso': 'application/octetstream'}
 
-class Shark(object):
 	def __init__(self, ip, porta, raiz=RAIZ):
 		self.nome = SERVER
 		self.error = NOT_FOUND
@@ -43,6 +44,12 @@ class Shark(object):
 	def pagina_erro(self, local):
 		self.error = local
 
+	def get_extensoes(self, extensoes):
+		return self.ext
+
+	def set_extensoes(self, extensoes):
+		self.ext = extensoes
+
 	def set_raiz(self, raiz):
 		if os.path.exists('./' + raiz):
 			if raiz[-1] != '/':
@@ -56,10 +63,10 @@ class Shark(object):
 		return "HTTP/1.1 " + STATUS[code]
 
 	def obter_tipo(self, tipo):
-		if tipo not in ext:
+		if tipo not in self.ext:
 			content = EXT_PADRAO
 		else:
-			content = ext[tipo]
+			content = self.ext[tipo]
 
 		return content
 
@@ -78,7 +85,8 @@ class Shark(object):
 			if arq == '':
 				arq = 'index.html'
 
-			print diretorio
+			arq = arq.replace('%20', ' ')
+			diretorio = diretorio.replace('%20', ' ')
 			f = open('.' + diretorio, 'r')
 			dados = f.read()
 
