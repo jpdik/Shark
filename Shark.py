@@ -28,6 +28,7 @@ class Shark(object):
 	   'jpg': 'image/jpg',
 	   'iso': 'application/octetstream'}
 
+
 	def __init__(self, ip, porta, raiz=RAIZ):
 		self.nome = SERVER
 		self.error = NOT_FOUND
@@ -87,7 +88,12 @@ class Shark(object):
 
 			arq = arq.replace('%20', ' ')
 			diretorio = diretorio.replace('%20', ' ')
-			f = open('.' + diretorio, 'r')
+
+			print diretorio
+			if diretorio == self.raiz:
+				f = open('.' + diretorio + arq, 'r')
+			else:
+				f = open('.' + diretorio, 'r')
 			dados = f.read()
 
 			utc_datetime = datetime.datetime.utcnow()
