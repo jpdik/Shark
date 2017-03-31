@@ -47,7 +47,7 @@ ou
 python sv_http.py 127.0.0.1 8082
 </pre>
   
-Após o servidor estar executando, basta chamar o servidor no Navegaos atraves do IP:PORTA:
+Após o servidor estar executando, basta chamar o servidor no Navegador atraves do IP:PORTA:
 Exemplo:
 <pre>
 127.0.0.1:8082
