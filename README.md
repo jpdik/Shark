@@ -28,7 +28,7 @@ sk = Shark('127.0.0.1', 8082)
 
 Também pode ser passado um terceiro parâmetro para mudar a raiz do servidor.
 Exemplo:
-</pre>
+<pre>
 sk = Shark('127.0.0.1', 8082, '/www')
 </pre>
 
