@@ -24,7 +24,7 @@ O primeiro é o IP onde será rodado o servidor (IP local ou IP da máquina)
 O segundo é a porta onde será executado o servidor.
 <pre>
 sk = Shark('127.0.0.1', 8082)
-<pre>
+</pre>
 
 Também pode ser passado um terceiro parâmetro para mudar a raiz do servidor.
 Exemplo:
