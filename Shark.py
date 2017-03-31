@@ -89,7 +89,6 @@ class Shark(object):
 			arq = arq.replace('%20', ' ')
 			diretorio = diretorio.replace('%20', ' ')
 
-			print diretorio
 			if diretorio == self.raiz:
 				f = open('.' + diretorio + arq, 'r')
 			else:
@@ -188,8 +187,6 @@ Content-Length: {0}
 		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 		s.bind((self.ip, self.porta))
-
-		print self.ip
 
 		s.listen(5)
 
