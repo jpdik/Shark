@@ -2,7 +2,7 @@
 Servidor HTTP Simples
 
 Programado em Socket na linguagem python na Disciplia de Redes do 3º período
-do Curso Tecnologia em Sistemas de Sistemas para Internet com a orietanção do Professor Rafael Alencar.
+do Curso Tecnologia em Sistemas para Internet, com a orietanção do Professor Rafael Alencar.
 
 O servidor criado usará a pasta raiz de onde a aplicação for executada, mas pode ser alterada por parâmetro.
 
@@ -26,7 +26,7 @@ O segundo é a porta onde será executado o servidor.
 sk = Shark('127.0.0.1', 8082)
 </pre>
 
-Também pode ser passado um terceiro parâmetro para mudar a raiz do servidor.
+Passando um terceiro parâmetro para mudar a raiz do servidor.
 Exemplo:
 <pre>
 sk = Shark('127.0.0.1', 8082, '/www')
